@@ -28,8 +28,8 @@ ants_cycle <- function(app,m,n,h,t,alpha,beta){
 
 
 ants_information <- function(x,y){
-	iter <- 15; #number of cycles
-	m <- 100; #number of ants
+	iter <- 1000; #number of cycles
+	m <- 500; #number of ants
 	# x <- c(8,0,-1,2,4,6,3,10,2.5,-5,7,9,11,13);
 	# y <- c(2,4,6,-1,-2,0.5,0,3.7,1.8,1,0,4,3,2);
 	n <- length(x); #number of nodes
@@ -92,10 +92,15 @@ ants_tranceupdating <- function(m,n,t,at,f,e){
 	return(t)
 }
 
+# plot<-function(...){
+#   graphics::plot.new()
+#   graphics::plot(...)
+# }
+
 main <- function(){
-	df <- read.table("http://www.math.uwaterloo.ca/tsp/world/qa194.tsp", 
-                 header = FALSE, skip=7, nrows=194)
-	debug <- FALSE
+	df <- read.table("http://www.math.uwaterloo.ca/tsp/world/wi29.tsp", 
+                 header = FALSE, skip=7, nrows=29)
+	debug <- TRUE
 	if(debug)
 		print("Done reading")
 	x <- df[2]
@@ -143,9 +148,10 @@ main <- function(){
 			print(sprintf("%d:   %f  took: %s   best so far:%f  found at iteration:%d ", i,mincost[i],endIterTime- startIterTime, min(mincost), which.min(mincost)))
 
 	}
+	windows()
 	par(mfrow=c(2,1))
 	title <- "average of cost (distance) versus number of cycles"
-	plot(iteration,costoa, type="l", main=title, xlab = "distance", ylab =" iteration")
+	plot(iteration,costoa, type="l", main=title, xlab = "iteration", ylab ="distance")
 	k <- min(mincost); 
 	l <- which.min(mincost); #index of where is min
 	X <- Y <- c();
@@ -153,7 +159,13 @@ main <- function(){
 	for(i in 1:(n+1)){
 		X[i] <- x[besttour[l,i]]
 		Y[i] <- y[besttour[l,i]]
+		#feed ant path into r
 		cat(X[i], "," ,Y[i], "\n")
+		#feed regular path into r
+		# if(i < n+1)
+		# 	cat(x[i], "," ,y[i], "\n")
+		# else
+		# 	cat(x[1], "," ,y[1], "\n")
 	}
 	#  print(X)
 	# print(Y)
@@ -166,6 +178,7 @@ main <- function(){
 	# textxy(X,Y,coordinates,m=c(0,0))
 }
  main()
+ locator(1)
 # x_last <- runif(1)
 # for(i in 1:15){
 # x_now <- runif(1)

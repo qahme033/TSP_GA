@@ -8,6 +8,7 @@ that can be found at: http://goo.gl/cJEY1
 import codecs
 import math
 import random
+import subprocess
 
 
 class City:
@@ -74,9 +75,9 @@ class Tour:
       self.tour[key] = value
    
    def __repr__(self):
-      geneString = "|"
+      geneString = ""
       for i in range(0, self.tourSize()):
-         geneString += str(self.getCity(i)) + "|"
+         geneString += "("  + str(self.getCity(i)) + ")"
       return geneString
    
    def generateIndividual(self):
@@ -228,6 +229,24 @@ def getCoordinates():
          coordinates.append([float(lineParts[1]), float(lineParts[2])])
    return coordinates
 
+def graphTour(tour):
+   # Define command and arguments
+   command = 'Rscript'
+   path2script = 'graphTour.r'
+   strTour = ""
+   for i in tour:
+      strTour += str(i.getX()) + "," + str(i.getY()) + "#"
+   # # Variable number of args in a list
+   args = [strTour]
+
+   # # Build subprocess command
+   cmd = [command, path2script] + args
+
+   # # check_output will run the command and store to result
+   s = subprocess.check_output(cmd, universal_newlines=True)
+   print(s)
+   return
+
 if __name__ == '__main__':
    coordinates = getCoordinates();
    tourmanager = TourManager()
@@ -280,18 +299,18 @@ if __name__ == '__main__':
    # # tourmanager.addCity(city20)
    
    # Initialize population
-   pop = Population(tourmanager, len(coordinates), True);
+   pop = Population(tourmanager, 50, True);
    print "Initial distance: " + str(pop.getFittest().getDistance())
    
    # Evolve population for 50 generations
    ga = GA(tourmanager)
    pop = ga.evolvePopulation(pop)
-   for i in range(0, 100):
+   for i in range(0, 1000):
       pop = ga.evolvePopulation(pop)
    
    # Print final results
    print "Finished"
    print "Final distance: " + str(pop.getFittest().getDistance())
    print "Solution:"
-   print pop.getFittest()
-   
+   #print pop.getFittest()
+   graphTour(pop.getFittest())

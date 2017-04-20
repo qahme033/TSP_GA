@@ -254,6 +254,23 @@ def getCoordinatesR():
       coordinates.append([float(x.strip()),float(y.strip())])
    return coordinates
 
+def graphTour(tour):
+   # Define command and arguments
+   command = 'Rscript'
+   path2script = 'graphTour.r'
+   strTour = ""
+   for i in tour:
+      strTour += str(i.getX()) + "," + str(i.getY()) + "#"
+   # # Variable number of args in a list
+   args = [strTour]
+
+   # # Build subprocess command
+   cmd = [command, path2script] + args
+
+   # # check_output will run the command and store to result
+   s = subprocess.check_output(cmd, universal_newlines=True)
+   print(s)
+   return
 
 if __name__ == '__main__':
    coordinates = getCoordinatesR();
@@ -316,7 +333,7 @@ if __name__ == '__main__':
    # Evolve population for 50 generations
    ga = GA(tourmanager)
    pop = ga.evolvePopulation(pop)
-   for i in range(0, 100):
+   for i in range(0, 5000):
       pop = ga.evolvePopulation(pop)
    
    # Print final results
@@ -324,4 +341,5 @@ if __name__ == '__main__':
    print "Final distance: " + str(pop.getFittest().getDistance())
    print "Solution:"
    #print pop.getFittest()
+   graphTour(pop.getFittest())
    
