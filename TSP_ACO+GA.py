@@ -6,9 +6,9 @@ entitled "Applying a genetic algorithm to the travelling salesman problem"
 that can be found at: http://goo.gl/cJEY1
 """
 import codecs
-import subprocess
 import math
 import random
+import subprocess
 
 
 class City:
@@ -59,6 +59,7 @@ class Tour:
       self.tour = []
       self.fitness = 0.0
       self.distance = 0
+      self.shuffle = False
       if tour is not None:
          self.tour = tour
       else:
@@ -83,7 +84,9 @@ class Tour:
    def generateIndividual(self):
       for cityIndex in range(0, self.tourmanager.numberOfCities()):
          self.setCity(cityIndex, self.tourmanager.getCity(cityIndex))
-      #random.shuffle(self.tour)
+      if(self.shuffle):
+         random.shuffle(self.tour)
+      self.shuffle = True
    
    def getCity(self, tourPosition):
       return self.tour[tourPosition]
@@ -98,9 +101,7 @@ class Tour:
          self.fitness = 1/float(self.getDistance())
       return self.fitness
    
-   def getDistance(self, flag=False):
-      if(flag):
-         print("call")
+   def getDistance(self):
       if self.distance == 0:
          tourDistance = 0
          for cityIndex in range(0, self.tourSize()):
@@ -111,9 +112,6 @@ class Tour:
             else:
                destinationCity = self.getCity(0)
             tourDistance += fromCity.distanceTo(destinationCity)
-            if(flag):
-               print cityIndex
-               print tourDistance
          self.distance = tourDistance
       return self.distance
    
@@ -234,25 +232,24 @@ def getCoordinates():
          coordinates.append([float(lineParts[1]), float(lineParts[2])])
    return coordinates
 
-def getCoordinatesR():
-   # Define command and arguments
-   command = 'Rscript'
-   path2script = 'ACO_algorithm.r'
-
-   # Variable number of args in a list
-   args = []
-
-   # Build subprocess command
-   cmd = [command, path2script] + args
-
-   # check_output will run the command and store to result
-   s = subprocess.check_output(cmd, universal_newlines=True)
-   coordinates = []
-   for i in s[:-1].split("\n"):
-      x = i.split(",")[0]
-      y = i.split(",")[1]
-      coordinates.append([float(x.strip()),float(y.strip())])
-   return coordinates
+def getCoordinatesRStatic():
+      #get TSP coordinates
+   coordinates = [];
+   f = codecs.open('myData.txt','r',"utf-8")
+   count = 0
+   allTourPoints = []
+   for line in f:
+      count += 1
+      if((count % 2) == 0):
+         continue
+      lineParts = line.split(",")
+      tourLength = lineParts[-1].strip().split(" ")[2]
+      tourCoordinates = [tourLength, []]
+      for linePartsParts in lineParts :
+          coordinatesString = linePartsParts.strip().split(" ")
+          tourCoordinates[1].append([float(coordinatesString[0]), float(coordinatesString[1])])
+      allTourPoints.append(tourCoordinates)
+   return allTourPoints
 
 def graphTour(tour):
    # Define command and arguments
@@ -273,67 +270,69 @@ def graphTour(tour):
    return
 
 if __name__ == '__main__':
-   coordinates = getCoordinatesR();
-   #print(coordinates)
+   coordinates = getCoordinatesRStatic();
    tourmanager = TourManager()
-   for i in range(1,len(coordinates)):
-      #print(coordinates[i][0], coordinates[i][1])
-      city = City(coordinates[i][0], coordinates[i][1])
-      tourmanager.addCity(city)
+   # for i in range(1,len(coordinates)):
+   #    #print(coordinates[i][0], coordinates[i][1])
+   #    city = City(coordinates[i][0], coordinates[i][1])
+   #    tourmanager.addCity(city)
    
+   for i in range(0,len(coordinates[-1][1])):
+        #print(coordinates[j][1][i][0], coordinates[j][1][i][1])
+        city = City(coordinates[-1][1][i][0], coordinates[-1][1][i][1])
+        tourmanager.addCity(city)
+
    
-   #Create and add our cities
-   # city = City(10, 200)
-   # tourmanager.addCity(city)
-   # city2 = City(20, 200)
-   # tourmanager.addCity(city2)
-   # city3 = City(30, 200)
-   # tourmanager.addCity(city3)
-   # city4 = City(140, 180)
-   # tourmanager.addCity(city4)
-   # city5 = City(20, 160)
-   # tourmanager.addCity(city5)
-   # city6 = City(100, 160)
-   # tourmanager.addCity(city6)
-   # city7 = City(200, 160)
-   # tourmanager.addCity(city7)
-   # city8 = City(140, 140)
-   # tourmanager.addCity(city8)
-   # city9 = City(40, 120)
-   # tourmanager.addCity(city9)
-   # city10 = City(100, 120)
-   # tourmanager.addCity(city10)
-   # city11 = City(180, 100)
-   # tourmanager.addCity(city11)
-   # city12 = City(60, 80)
-   # tourmanager.addCity(city12)
-   # city13 = City(120, 80)
-   # tourmanager.addCity(city13)
-   # city14 = City(180, 60)
-   # tourmanager.addCity(city14)
-   # city15 = City(20, 40)
-   # tourmanager.addCity(city15)
-   # city16 = City(100, 40)
-   # tourmanager.addCity(city16)
-   # city17 = City(200, 40)
-   # tourmanager.addCity(city17)
-   # city18 = City(20, 20)
-   # tourmanager.addCity(city18)
-   # city19 = City(60, 20)
-   # tourmanager.addCity(city19)
-   # city20 = City(160, 20)
-   # tourmanager.addCity(city20)
+   # # # Create and add our cities
+   # # city = City(60, 200)
+   # # tourmanager.addCity(city)
+   # # city2 = City(180, 200)
+   # # tourmanager.addCity(city2)
+   # # city3 = City(80, 180)
+   # # tourmanager.addCity(city3)
+   # # city4 = City(140, 180)
+   # # tourmanager.addCity(city4)
+   # # city5 = City(20, 160)
+   # # tourmanager.addCity(city5)
+   # # city6 = City(100, 160)
+   # # tourmanager.addCity(city6)
+   # # city7 = City(200, 160)
+   # # tourmanager.addCity(city7)
+   # # city8 = City(140, 140)
+   # # tourmanager.addCity(city8)
+   # # city9 = City(40, 120)
+   # # tourmanager.addCity(city9)
+   # # city10 = City(100, 120)
+   # # tourmanager.addCity(city10)
+   # # city11 = City(180, 100)
+   # # tourmanager.addCity(city11)
+   # # city12 = City(60, 80)
+   # # tourmanager.addCity(city12)
+   # # city13 = City(120, 80)
+   # # tourmanager.addCity(city13)
+   # # city14 = City(180, 60)
+   # # tourmanager.addCity(city14)
+   # # city15 = City(20, 40)
+   # # tourmanager.addCity(city15)
+   # # city16 = City(100, 40)
+   # # tourmanager.addCity(city16)
+   # # city17 = City(200, 40)
+   # # tourmanager.addCity(city17)
+   # # city18 = City(20, 20)
+   # # tourmanager.addCity(city18)
+   # # city19 = City(60, 20)
+   # # tourmanager.addCity(city19)
+   # # city20 = City(160, 20)
+   # # tourmanager.addCity(city20)
    
    # Initialize population
-   pop = Population(tourmanager, 4, True);
-   # print pop.getTour(1)
-   # print pop.getFittest().getDistance(True)
+   pop = Population(tourmanager, 50, True);
    print "Initial distance: " + str(pop.getFittest().getDistance())
    
    # Evolve population for 50 generations
    ga = GA(tourmanager)
    pop = ga.evolvePopulation(pop)
-   for i in range(0, 5000):
+   for i in range(0, 100):
       pop = ga.evolvePopulation(pop)
    
    # Print final results
@@ -342,4 +341,3 @@ if __name__ == '__main__':
    print "Solution:"
    #print pop.getFittest()
    graphTour(pop.getFittest())
-   
