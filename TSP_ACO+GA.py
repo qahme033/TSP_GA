@@ -9,6 +9,8 @@ import codecs
 import math
 import random
 import subprocess
+import datetime
+
 
 
 class City:
@@ -270,6 +272,7 @@ def graphTour(tour):
    return
 
 if __name__ == '__main__':
+   startTime = datetime.datetime.now()
    coordinates = getCoordinatesRStatic();
    tourmanager = TourManager()
    # for i in range(1,len(coordinates)):
@@ -331,9 +334,17 @@ if __name__ == '__main__':
    
    # Evolve population for 50 generations
    ga = GA(tourmanager)
+   generationCount = 1
+   print "Evolving Generation " + str(generationCount) + ". Total time elapsed: " + str(datetime.datetime.now() - startTime)
    pop = ga.evolvePopulation(pop)
+   fittest = pop.getFittest().getDistance()
    for i in range(0, 100):
+      generationCount += 1
+      print "Evolving Generation " + str(generationCount) + ". Total time elapsed: " + str(datetime.datetime.now() - startTime) + " Fittest yet = " + str(fittest)
       pop = ga.evolvePopulation(pop)
+      if(pop.getFittest().getDistance() < fittest):
+         fittest = pop.getFittest().getDistance()
+         graphTour(pop.getFittest())
    
    # Print final results
    print "Finished"
